@@ -1,0 +1,17 @@
+title tehtävä 0.6
+
+note over selain
+Save-nappia painettaessa js-koodi luo lomakedatasta
+muistiinpanon ja lisää sen muistiinpanojen listaan.
+Lista piirretään uudelleen, jonka jälkeen muistiinpano
+lähetetään JSON-muodossa palvelimelle.
+end note
+
+selain->palvelin: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+
+note over palvelin
+Palvelin vastaa HTTP-statuskoodilla 201. Vastauksen
+sisältönä on JSON-muotoinen viesti {"message":"note created"}
+end note
+
+palvelin-->selain: 201 Created
