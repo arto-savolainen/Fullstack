@@ -24,14 +24,16 @@ const Statistics = (props) => {
     return (
       <div>
         <StatisticsHeader />
-
-        <StatisticsLine text="good" value={props.good} />
-        <StatisticsLine text="neutral" value={props.neutral} />
-        <StatisticsLine text="bad" value={props.bad} />
-
-        <StatisticsLine text="all" value={sumAll()} />
-        <StatisticsLine text="average" value={average()} />
-        <StatisticsLine text="positive" value={positivePct()} />
+        <table>
+          <tbody>
+            <StatisticsLine text="good" value={props.good} />
+            <StatisticsLine text="neutral" value={props.neutral} />
+            <StatisticsLine text="bad" value={props.bad} />
+            <StatisticsLine text="all" value={sumAll()} />
+            <StatisticsLine text="average" value={average()} />
+            <StatisticsLine text="positive" value={positivePct()} />
+          </tbody>
+        </table>
       </div>
     )
   
@@ -45,11 +47,7 @@ const Statistics = (props) => {
 
 const StatisticsHeader = () => <h1>statistics</h1>
 
-const StatisticsLine = ({text, value}) => {
-  return <p>{text} {value}</p>
-}
-
-
+const StatisticsLine = ({text, value}) => <tr><td>{text}</td><td>{value}</td></tr>
 
 
 const App = () => {
