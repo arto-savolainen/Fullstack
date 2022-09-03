@@ -16,32 +16,39 @@ const Statistics = (props) => {
   }
 
   const positivePct = () => {
-    if (props.good === 0) return 0 
-    return props.good / sumAll() * 100
+    if (props.good === 0) return "0%"
+    return props.good / sumAll() * 100 + "%"
   }
 
   if (sumAll() > 0) 
     return (
       <div>
-        <h1>statistics</h1>
+        <StatisticsHeader />
 
-        <p>good {props.good}</p>
-        <p>neutral {props.neutral}</p>
-        <p>bad {props.bad}</p>
+        <StatisticsLine text="good" value={props.good} />
+        <StatisticsLine text="neutral" value={props.neutral} />
+        <StatisticsLine text="bad" value={props.bad} />
 
-        <p>all {sumAll()}</p>
-        <p>average {average()}</p>
-        <p>positive {positivePct()}%</p>
+        <StatisticsLine text="all" value={sumAll()} />
+        <StatisticsLine text="average" value={average()} />
+        <StatisticsLine text="positive" value={positivePct()} />
       </div>
     )
   
   return (
     <div>
-      <h1>statistics</h1>
+      <StatisticsHeader />
       <p>No feedback given</p>
     </div>
   )
 }
+
+const StatisticsHeader = () => <h1>statistics</h1>
+
+const StatisticsLine = ({text, value}) => {
+  return <p>{text} {value}</p>
+}
+
 
 
 
