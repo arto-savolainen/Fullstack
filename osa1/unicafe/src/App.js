@@ -20,20 +20,26 @@ const Statistics = (props) => {
     return props.good / sumAll() * 100
   }
 
+  if (sumAll() > 0) 
+    return (
+      <div>
+        <h1>statistics</h1>
+
+        <p>good {props.good}</p>
+        <p>neutral {props.neutral}</p>
+        <p>bad {props.bad}</p>
+
+        <p>all {sumAll()}</p>
+        <p>average {average()}</p>
+        <p>positive {positivePct()}%</p>
+      </div>
+    )
+  
   return (
-  <div>
-    <h1>Statistics</h1>
-    <br/>
-
-    <p>good {props.good}</p>
-    <p>neutral {props.neutral}</p>
-    <p>bad {props.bad}</p>
-
-    <p>all {sumAll()}</p>
-    <p>average {average()}</p>
-    <p>positive {positivePct()}%</p>
-
-  </div>
+    <div>
+      <h1>statistics</h1>
+      <p>No feedback given</p>
+    </div>
   )
 }
 
