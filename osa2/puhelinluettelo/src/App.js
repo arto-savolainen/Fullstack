@@ -6,6 +6,35 @@ const DisplayPerson = ({ person }) => {
   )
 }
 
+const DisplayPersons = ({ persons, nameFilter }) => {
+  return (
+    <div>
+      {persons.filter(x => nameFilter === '' || x.name.toLowerCase().includes(nameFilter.toLowerCase()))
+      .map(x => <DisplayPerson key={x.name} person={x} />)}
+    </div>
+  )
+}
+
+const Filter = ({ filter, handler }) => {
+  return (
+    <div>
+    filter shown with <input value={filter} onChange={handler} />
+    </div>
+  )
+}
+
+const NewPersonForm = (props) => {
+  return (
+    <form onSubmit={props.addNewPersonHandler}>
+      <div> name: <input value={props.name} onChange={props.nameChangeHandler} /></div>
+      <div>number: <input value={props.number} onChange={props.numberChangeHandler} /></div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { 
@@ -52,18 +81,13 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>filter shown with <input value={nameFilter} onChange={handleFilterChange} /></div>
+      <Filter filter={nameFilter} handler={handleFilterChange} />
+
       <h2>Add a new</h2>
-      <form onSubmit={addNewPerson}>
-        <div> name: <input value={newName} onChange={handleNameChange} /></div>
-        <div>number: <input value={newNumber} onChange={handleNumberChange}/></div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <NewPersonForm name={newName} number={newNumber} nameChangeHandler={handleNameChange} numberChangeHandler={handleNumberChange} addNewPersonHandler={addNewPerson} />
+
       <h2>Numbers</h2>
-      {persons.filter(x => nameFilter === '' || x.name.toLowerCase().includes(nameFilter.toLowerCase()))
-      .map(x => <DisplayPerson key={x.name} person={x} />)}
+      <DisplayPersons persons={persons} nameFilter={nameFilter} />
     </div>
   )
 }
