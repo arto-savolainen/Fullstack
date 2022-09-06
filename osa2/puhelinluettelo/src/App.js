@@ -2,22 +2,32 @@ import { useState } from 'react'
 
 const DisplayPerson = ({ person }) => {
   return (
-    <p>{person.name}</p>
+    <p>{person.name} {person.number}</p>
   )
 }
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' },
-    { name: 'Arto Savolainen' }
+    { 
+      name: 'Arto Hellas',
+      number: '0500'
+    },
+    { 
+      name: 'Arto Savolainen',
+      number: 'xxxxxxxxxxx' }
   ]) 
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
 
-  const addNewName = (event) => {
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value)
+  }
+
+  const addNewPerson = (event) => {
     event.preventDefault()
 
     if (persons.some(x => x.name === newName)) {
@@ -25,17 +35,21 @@ const App = () => {
       return
     }
 
-    setPersons(persons.concat({ name: newName }))
+    const newPerson = {
+      name: newName,
+      number: newNumber
+    }
+    setPersons(persons.concat(newPerson))
     setNewName('')
+    setNewNumber('')
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addNewName}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
+      <form onSubmit={addNewPerson}>
+        <div> name: <input value={newName} onChange={handleNameChange} /></div>
+        <div>number: <input value={newNumber} onChange={handleNumberChange}/></div>
         <div>
           <button type="submit">add</button>
         </div>
