@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { weatherCodes } from './modules/weather'
 
 const DisplayCountry = ({ country }) => {
   const languages = Object.entries(country.languages).map(x => {
@@ -7,6 +8,21 @@ const DisplayCountry = ({ country }) => {
       return { langShort: x[0], lang: x[1] }
     }
   })
+  const latitude = country.latlng[0]
+  const longitude = country.latlng[1]
+  const weatherApiURL = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,cloudcover,windspeed_10m&current_weather=true&windspeed_unit=ms`
+  const [weather, setWeather] = useState({ temperature: "", windspeed: "", weathercode: "" })
+
+  useEffect(() => {
+    axios
+      .get(weatherApiURL)
+      .then(response => {      
+        const weatherObject = { temperature: response.data.current_weather.temperature,
+          windspeed: response.data.current_weather.windspeed,
+          weathercode: response.data.current_weather.weathercode }
+        setWeather(weatherObject)
+      })
+  }, [])
 
   return (
     <div>
@@ -20,6 +36,10 @@ const DisplayCountry = ({ country }) => {
         })}
       </ul>
       <img src={country.flags.png} />
+      <h3>Weather in {country.name.common}</h3>
+      <div>temperature {weather.temperature} Celsius</div>
+      <div>{weatherCodes.get(weather.weathercode)}</div>
+      <div>wind {weather.windspeed} m/s</div>
     </div>
   )
 }
