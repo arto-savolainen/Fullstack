@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { weatherCodes } from './modules/weather'
 
-const DisplayCountry = ({ country }) => {
-  const languages = Object.entries(country.languages).map(x => {
-    if (x.length === 2) {
-      return { langShort: x[0], lang: x[1] }
-    }
-  })
-  const latitude = country.latlng[0]
-  const longitude = country.latlng[1]
+const DisplayWeather = ({ latitude, longitude, countryName }) => {
   const weatherApiURL = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,cloudcover,windspeed_10m&current_weather=true&windspeed_unit=ms`
   const [weather, setWeather] = useState({ temperature: "", windspeed: "", weathercode: "" })
 
@@ -26,6 +19,23 @@ const DisplayCountry = ({ country }) => {
 
   return (
     <div>
+      <h3>Weather in {countryName}</h3>
+      <div>temperature {weather.temperature} Celsius</div>
+      <div>{weatherCodes.get(weather.weathercode)}</div>
+      <div>wind {weather.windspeed} m/s</div>
+    </div>
+  )
+}
+
+const DisplayCountry = ({ country }) => {
+  const languages = Object.entries(country.languages).map(x => {
+    if (x.length === 2) {
+      return { langShort: x[0], lang: x[1] }
+    }
+  })
+
+  return (
+    <div>
       <h1>{country.name.common}</h1>
       <p>capital {country.capital}</p>
       <p>area {country.area}</p>
@@ -36,10 +46,7 @@ const DisplayCountry = ({ country }) => {
         })}
       </ul>
       <img src={country.flags.png} />
-      <h3>Weather in {country.name.common}</h3>
-      <div>temperature {weather.temperature} Celsius</div>
-      <div>{weatherCodes.get(weather.weathercode)}</div>
-      <div>wind {weather.windspeed} m/s</div>
+      <DisplayWeather latitude={country.latlng[0]} longitude={country.latlng[1]} countryName={country.name.common} />
     </div>
   )
 }
