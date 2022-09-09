@@ -24,7 +24,7 @@ const DisplayCountry = ({ country }) => {
   )
 }
 
-const DisplayCountries = ({ countries, filter }) => {
+const DisplayCountries = ({ countries, filter, setFilter }) => {
   if (countries.length === 0 || filter === '') { return }
 
   const countriesFiltered = countries.filter(x => x.name.common.toLowerCase().includes(filter.toLowerCase()))
@@ -41,7 +41,13 @@ const DisplayCountries = ({ countries, filter }) => {
 
   return (
     <div>
-      {countriesFiltered.map(x => <p key={x.name.common}>{x.name.common}</p>)}
+      {countriesFiltered.map(x => {
+        return (
+          <div key={x.name.common}>{x.name.common} <button onClick={() => {
+            setFilter(x.name.common)
+          }}>show</button></div>
+        )
+      })}
     </div>
   )
 }
@@ -73,7 +79,7 @@ const App = () => {
   return (
     <div>
       <Filter filter={filter} handler={handleFilterChange} />
-      <DisplayCountries countries={countries} filter={filter} />
+      <DisplayCountries countries={countries} filter={filter} setFilter={setFilter}/>
     </div>
   )
 }
