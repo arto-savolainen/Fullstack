@@ -1,6 +1,56 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
+let notificationTimeoutId
+let errorTimeoutId
+
+const Notification = ({ message }) => {
+  const notificationStyle = {
+    color: "green",
+    fontStyle: "bold",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    borderColor: "#008000",
+    backgroundColor: "#ebfaeb",
+    padding: 8,
+    margin: 5
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="notification" style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
+
+const ErrorMessage = ({ message }) => {
+  const errorStyle = {
+    color: "red",
+    fontStyle: "bold",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    borderColor: "#b30000",
+    backgroundColor: "#ffcccc",
+    padding: 8,
+    margin: 5
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error" style={errorStyle}>
+      {message}
+    </div>
+  )
+}
 
 const DisplayPerson = ({ person, deleteHandler }) => {
   return (
@@ -42,6 +92,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setFilter] = useState('')
+  const [notificationText, setNotification] = useState(null)
+  const [errorText, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -84,6 +136,11 @@ const App = () => {
             }))
             setNewName('')
             setNewNumber('')
+            newNotification(`Replaced the old number of ${updatedPerson.name}. New number is ${updatedPerson.number}`, 8000)
+          })
+          .catch(error => {
+            newErrorMessage(`Information of ${updatedPerson.name} has already been removed from server`)
+            setPersons(persons.filter(x => x.id !== updatedPerson.id))
           })
       }
 
@@ -101,6 +158,10 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+        newNotification(`Added ${newPerson.name} ${newPerson.number}`)
+      })
+      .catch(error => {
+        newErrorMessage(`Something went wrong. Don't ask me what.`)
       })
   }
 
@@ -110,13 +171,44 @@ const App = () => {
         .remove(person.id)
         .then(() => {
           setPersons(persons.filter(x => x.id !== person.id))
+          newNotification(`Deleted ${person.name}`)
+        })
+        .catch(error => {
+          newErrorMessage(`Information of ${person.name} has already been removed from server`)
+          setPersons(persons.filter(x => x.id !== person.id))
         })
     }
+  }
+
+  const newNotification = (message, timeout = 6000) => {
+    setNotification(message)
+    
+    if (notificationTimeoutId != null) {
+      clearTimeout(notificationTimeoutId)
+    }
+
+    notificationTimeoutId = setTimeout(() => {
+      setNotification(null)
+    }, timeout)
+  }
+
+  const newErrorMessage = (message, timeout = 6000) => {
+    setErrorMessage(message)
+
+    if (errorTimeoutId != null) {
+      clearTimeout(errorTimeoutId)
+    }
+
+    errorTimeoutId = setTimeout(() => {
+      setErrorMessage(null)
+    }, timeout)
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <ErrorMessage message={errorText} />
+      <Notification message={notificationText} />
       <Filter filter={nameFilter} handler={handleFilterChange} />
 
       <h2>Add a new</h2>
