@@ -62,7 +62,7 @@ const DisplayPersons = ({ persons, nameFilter, deleteHandler }) => {
   return (
     <div>
       {persons.filter(x => nameFilter === '' || x.name.toLowerCase().includes(nameFilter.toLowerCase()))
-      .map(x => <DisplayPerson key={x.name} person={x} deleteHandler={deleteHandler} />)}
+      .map(x => <DisplayPerson key={x.id} person={x} deleteHandler={deleteHandler} />)}
     </div>
   )
 }
@@ -101,6 +101,9 @@ const App = () => {
       .then(initialPersons => {
         setPersons(initialPersons)
       })
+      .catch(error => {
+        newErrorMessage(`Something went wrong. Don't ask me what.`)
+      })
   }, [])
 
   const handleNameChange = (event) => {
@@ -118,47 +121,57 @@ const App = () => {
   const addNewPerson = (event) => {
     event.preventDefault()
 
-    if (persons.some(x => x.name === newName)) {
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        const updatedPerson = persons.find(x => x.name === newName)
-        updatedPerson.number = newNumber
+    //Update local persons list first, in case a new person is added from another browser with unrefreshed persons list
+    //Gets the whole database every time new entry is added, necessary with this db configuration to prevent duplicate persons
+    personService
+      .getAll()
+      .then(currentPersons => {
+        if (currentPersons.some(x => x.name === newName)) {
+          if (window.confirm(`${newName} is already added to phonebook, replace old number with ${newNumber}?`)) {
+            const updatedPerson = currentPersons.find(x => x.name === newName)
+            updatedPerson.number = newNumber
+
+            personService
+              .update(updatedPerson.id, updatedPerson)
+              .then(() => {
+                setPersons(currentPersons.map(x => {
+                  if (x.id === updatedPerson.id) {
+                    return updatedPerson
+                  }
+                  else {
+                    return x
+                  }
+                }))
+
+                setNewName('')
+                setNewNumber('')
+                newNotification(`Replaced the old number of ${updatedPerson.name}. New number is ${updatedPerson.number}`, 8000)
+              })
+              .catch(error => {
+                newErrorMessage(`Information of ${updatedPerson.name} has already been removed from server`)
+                setPersons(persons.filter(x => x.id !== updatedPerson.id))
+              })
+          }
+
+          return
+        }
+
+        const newPerson = {
+          name: newName,
+          number: newNumber
+        }
 
         personService
-          .update(updatedPerson.id, updatedPerson)
-          .then(() => {
-            setPersons(persons.map(x => {
-              if (x.id === updatedPerson.id) {
-                return updatedPerson
-              }
-              else {
-                return x
-              }
-            }))
+          .create(newPerson)
+          .then(returnedPerson => {
+            setPersons(currentPersons.concat(returnedPerson))
             setNewName('')
             setNewNumber('')
-            newNotification(`Replaced the old number of ${updatedPerson.name}. New number is ${updatedPerson.number}`, 8000)
+            newNotification(`Added ${newPerson.name} ${newPerson.number}`)
           })
           .catch(error => {
-            newErrorMessage(`Information of ${updatedPerson.name} has already been removed from server`)
-            setPersons(persons.filter(x => x.id !== updatedPerson.id))
+            newErrorMessage(`Something went wrong. Don't ask me what.`)
           })
-      }
-
-      return
-    }
-
-    const newPerson = {
-      name: newName,
-      number: newNumber
-    }
-
-    personService
-      .create(newPerson)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
-        newNotification(`Added ${newPerson.name} ${newPerson.number}`)
       })
       .catch(error => {
         newErrorMessage(`Something went wrong. Don't ask me what.`)
