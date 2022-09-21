@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
 let notificationTimeoutId
 let errorTimeoutId
@@ -102,7 +101,7 @@ const App = () => {
         setPersons(initialPersons)
       })
       .catch(error => {
-        newErrorMessage(`Something went wrong. Don't ask me what.`)
+        newErrorMessage("Error loading initial database")
       })
   }, [])
 
@@ -170,11 +169,11 @@ const App = () => {
             newNotification(`Added ${newPerson.name} ${newPerson.number}`)
           })
           .catch(error => {
-            newErrorMessage(`Something went wrong. Don't ask me what.`)
+            newErrorMessage("Error creating new entry. Check that both name and number are defined.", 8000)
           })
       })
       .catch(error => {
-        newErrorMessage(`Something went wrong. Don't ask me what.`)
+        newErrorMessage("Error retrieving database")
       })
   }
 
