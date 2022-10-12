@@ -61,7 +61,7 @@ const DisplayPersons = ({ persons, nameFilter, deleteHandler }) => {
   return (
     <div>
       {persons.filter(x => nameFilter === '' || x.name.toLowerCase().includes(nameFilter.toLowerCase()))
-      .map(x => <DisplayPerson key={x.id} person={x} deleteHandler={deleteHandler} />)}
+        .map(x => <DisplayPerson key={x.id} person={x} deleteHandler={deleteHandler} />)}
     </div>
   )
 }
@@ -69,7 +69,7 @@ const DisplayPersons = ({ persons, nameFilter, deleteHandler }) => {
 const Filter = ({ filter, handler }) => {
   return (
     <div>
-    filter shown with <input value={filter} onChange={handler} />
+      filter shown with <input value={filter} onChange={handler} />
     </div>
   )
 }
@@ -120,8 +120,13 @@ const App = () => {
   const addNewPerson = (event) => {
     event.preventDefault()
 
+    if (!newNumber) {
+      newErrorMessage('Error: entry must include number')
+      return
+    }
+
     //Update local persons list first, in case a new person is added from another browser with unrefreshed persons list
-    //Gets the whole database every time new entry is added, necessary with this db configuration to prevent duplicate persons
+    //could implement a nameExists() api path in personService & backend to avoid getAll, maybe later
     personService
       .getAll()
       .then(currentPersons => {
@@ -147,8 +152,9 @@ const App = () => {
                 newNotification(`Replaced the old number of ${updatedPerson.name}. New number is ${updatedPerson.number}`, 8000)
               })
               .catch(error => {
-                newErrorMessage(`Information of ${updatedPerson.name} has already been removed from server`)
-                setPersons(persons.filter(x => x.id !== updatedPerson.id))
+                //newErrorMessage(`Error: information of ${updatedPerson.name} has already been removed from server.`)
+                newErrorMessage(error.response.data.error)
+                //setPersons(persons.filter(x => x.id !== updatedPerson.id))
               })
           }
 
@@ -169,7 +175,7 @@ const App = () => {
             newNotification(`Added ${newPerson.name} ${newPerson.number}`)
           })
           .catch(error => {
-            newErrorMessage("Error creating new entry. Check that both name and number are defined.", 8000)
+            newErrorMessage(error.response.data.error, 8000)
           })
       })
       .catch(error => {
@@ -186,18 +192,20 @@ const App = () => {
           newNotification(`Deleted ${person.name}`)
         })
         .catch(error => {
-          newErrorMessage(`Information of ${person.name} has already been removed from server`)
+          newErrorMessage(`Error: information of ${person.name} has already been removed from server`)
           setPersons(persons.filter(x => x.id !== person.id))
         })
     }
   }
 
   const newNotification = (message, timeout = 6000) => {
-    setNotification(message)
-    
     if (notificationTimeoutId != null) {
       clearTimeout(notificationTimeoutId)
     }
+
+    //Clear possible error message of previous action before displaying notification, looks nicer?
+    setErrorMessage(null)
+    setNotification(message)
 
     notificationTimeoutId = setTimeout(() => {
       setNotification(null)
@@ -205,11 +213,13 @@ const App = () => {
   }
 
   const newErrorMessage = (message, timeout = 6000) => {
-    setErrorMessage(message)
-
     if (errorTimeoutId != null) {
       clearTimeout(errorTimeoutId)
     }
+
+    //Clear possible notification of previous action before displaying error, looks nicer?
+    setNotification(null)
+    setErrorMessage(message)
 
     errorTimeoutId = setTimeout(() => {
       setErrorMessage(null)
@@ -223,7 +233,7 @@ const App = () => {
       <Notification message={notificationText} />
       <Filter filter={nameFilter} handler={handleFilterChange} />
 
-      <h2>Add a new</h2>
+      <h2>Add a new phonebook entry</h2>
       <NewPersonForm name={newName} number={newNumber} nameChangeHandler={handleNameChange} numberChangeHandler={handleNumberChange} addNewPersonHandler={addNewPerson} />
 
       <h2>Numbers</h2>
