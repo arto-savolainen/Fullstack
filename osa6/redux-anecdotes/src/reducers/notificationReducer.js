@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   message: null,
-  timeoutId: null
+  forceRenderHack: true
 }
 
 const slice = createSlice({
@@ -10,9 +10,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     showNotification(state, action) {
-      console.log('action.payload: ', action.payload)
-      state.message = action.payload[0]
-      state.timeoutId = action.payload[1]
+      state.message = action.payload
+      //If voting for the same anecdote consecutively, state.message remains the same so notification is not re-rendered
+      //This forces a re-render every time showNotification is dispatched, thus refreshing the timeout appropriately 
+      state.forceRenderHack = !state.forceRenderHack
     },
     clearNotification(state, action) {
       state.message = null
