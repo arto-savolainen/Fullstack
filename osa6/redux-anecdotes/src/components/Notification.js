@@ -5,7 +5,7 @@ let notificationTimeoutId = null
 
 const Notification = () => {
   const notification = useSelector(state => state.notification.message)
-  const hack = useSelector(state => state.notification.forceRenderHack)
+  useSelector(state => state.notification.forceRenderHack)
   const dispatch = useDispatch()
   const timeout = 5000
 
