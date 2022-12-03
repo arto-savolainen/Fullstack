@@ -12,7 +12,7 @@ const slice = createSlice({
     showNotification(state, action) {
       state.message = action.payload
       //If voting for the same anecdote consecutively, state.message remains the same so notification is not re-rendered
-      //This forces a re-render every time showNotification is dispatched, thus refreshing the timeout appropriately 
+      //Changing this value forces a re-render every time showNotification is dispatched, thus refreshing the timeout appropriately 
       state.forceRenderHack = !state.forceRenderHack
     },
     clearNotification(state, action) {
