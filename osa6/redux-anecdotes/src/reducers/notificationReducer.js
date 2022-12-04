@@ -1,25 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = {
-  message: null,
-  forceRenderHack: true
-}
+const initialState = null
+let notificationTimeoutId = null
 
 const slice = createSlice({
   name: 'notification',
   initialState,
   reducers: {
-    showNotification(state, action) {
-      state.message = action.payload
-      //If voting for the same anecdote consecutively, state.message remains the same so notification is not re-rendered
-      //Changing this value forces a re-render every time showNotification is dispatched, thus refreshing the timeout appropriately 
-      state.forceRenderHack = !state.forceRenderHack
+    setNotification(state, action) {
+      return action.payload
     },
     clearNotification(state, action) {
-      state.message = null
+      return null
     }
   }
 })
 
-export const { showNotification, clearNotification } = slice.actions
+export const { setNotification, clearNotification } = slice.actions
+
+export const showNotification = (message, timeout) => {
+  return dispatch => {
+    const timeoutms = timeout * 1000
+
+    dispatch(setNotification(message))
+
+    //if previous notification is still showing, clear its timeout so it won't clear current notification prematurely
+    if (notificationTimeoutId !== null) {
+      clearTimeout(notificationTimeoutId)
+    }
+
+    notificationTimeoutId = setTimeout(() => {
+      dispatch(clearNotification())
+    }, timeoutms)
+  }
+}
+
 export default slice.reducer

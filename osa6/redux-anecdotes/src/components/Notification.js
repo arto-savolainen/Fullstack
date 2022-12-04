@@ -1,24 +1,9 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { clearNotification } from '../reducers/notificationReducer'
-
-let notificationTimeoutId = null
+import { useSelector } from 'react-redux'
 
 const Notification = () => {
-  const notification = useSelector(state => state.notification.message)
-  useSelector(state => state.notification.forceRenderHack)
-  const dispatch = useDispatch()
-  const timeout = 5000
+  const notification = useSelector(state => state.notification)
 
   if (notification === null) { return null }
-
-  //if previous notification was still showing, clear its timeout so it won't clear current notification prematurely
-  if (notificationTimeoutId !== null) {
-    clearTimeout(notificationTimeoutId)
-  }
-
-  notificationTimeoutId = setTimeout(() => {
-    dispatch(clearNotification())
-  }, timeout)
 
   const style = {
     border: 'solid',
