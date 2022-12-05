@@ -37,14 +37,10 @@ export const createAnecdote = content => {
 }
 
 export const voteAnecdote = id => {
-  return async dispatch => {
-    //I had to create getAnecdote just for this function
-    //Seems like an unnecessary and slow workaround
-    //How do I access store state from within this function?
-    const anecdote = await anecdoteService.getAnecdote(id)
+  return async (dispatch, getState) => {
+    const anecdote = getState().anecdotes.find(x => x.id === id)
+    await anecdoteService.update({ ...anecdote, votes: anecdote.votes + 1 })
     dispatch(voteForAnecdote(id))
-    anecdote.votes++
-    await anecdoteService.update(anecdote)
   }
 }
  

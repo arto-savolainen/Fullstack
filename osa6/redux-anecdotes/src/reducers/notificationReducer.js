@@ -24,7 +24,7 @@ export const showNotification = (message, timeout) => {
 
     dispatch(setNotification(message))
 
-    //if previous notification is still showing, clear its timeout so it won't clear current notification prematurely
+    //Clear any possible timeout from a previous notification so it won't clear current notification prematurely
     if (notificationTimeoutId !== null) {
       clearTimeout(notificationTimeoutId)
     }
