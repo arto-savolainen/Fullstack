@@ -18,13 +18,9 @@ const Filter = (props) => {
   )
 }
 
-const mapDispatchToProps = {
-  filterChange
-}
-
 const ConnectedFilter = connect(
   null,
-  mapDispatchToProps
+  { filterChange }
 )(Filter)
 
 export default ConnectedFilter
