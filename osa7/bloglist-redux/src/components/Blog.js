@@ -1,11 +1,12 @@
 import { useDispatch, useSelector } from "react-redux"
-import { useMatch } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { updateBlogListState, likeBLog, removeBlog } from '../reducers/blogReducer'
 
 const Blog = () => {
   const blogs = useSelector(state => state.blogs)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const match = useMatch('blogs/:id')
   const blog = match ? blogs.find(x => x.id === match.params.id) : null
   let bloglink = ''
@@ -42,9 +43,10 @@ const Blog = () => {
     dispatch(likeBLog(blog.id))
   }
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
     if (window.confirm(`Delete blog ${blog.title} by ${blog.author}`)) {
       dispatch(removeBlog(blog.id))
+      navigate('/blogs')
     }
   }
 
@@ -55,7 +57,7 @@ const Blog = () => {
   return (
     <div>
       <h1 id='blog-title'>{blog.title} | {blog.author ? blog.author : 'Unknown author'}</h1>
-      <div id='blog-url'><a href={bloglink} target="_blank" rel="noopener noreferrer">{blog.url}</a></div>
+      <div id='blog-url'><a href={bloglink} target='_blank' rel='noopener noreferrer'>{blog.url}</a></div>
       <div id='blog-likes'>{blog.likes} <button id='like-button' onClick={handleLikeClick}>like</button></div>
       <div id='blog-user'>added by {blog.user ? blog.user.name : 'Unknown user'}</div>
       <button id='delete-blog-button' style={deleteBlogButtonStyle} onClick={handleDeleteClick}>delete blog</button>
